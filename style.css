@@ -486,7 +486,6 @@ ul li {
 }
 
 .btn-icon {
-    font-size: 1.35rem;
     background: rgba(255, 255, 255, 0.05);
     width: 2.2rem;
     height: 2.2rem;
@@ -495,6 +494,27 @@ ul li {
     justify-content: center;
     border-radius: 8px;
     flex-shrink: 0;
+}
+
+.btn-icon svg.svg-icon {
+    width: 1.2rem;
+    height: 1.2rem;
+    color: var(--primary);
+    transition: color 0.3s;
+}
+
+.sim-btn:hover:not(:disabled) .svg-icon {
+    color: #ffffff;
+}
+
+.sim-btn:disabled .svg-icon {
+    color: rgba(255, 255, 255, 0.2);
+}
+
+.btn-icon svg.svg-icon-figma {
+    width: 1.05rem;
+    height: 1.55rem;
+    display: block;
 }
 
 .btn-info {
@@ -510,6 +530,26 @@ ul li {
 .btn-sub {
     font-size: 0.75rem;
     color: var(--text-muted);
+}
+
+/* Push slide to the left when showing interactive simulator */
+.slide:has(.interactive-slide) {
+    max-width: 100%;
+    display: flex;
+    justify-content: flex-start;
+    padding-left: 5%;
+}
+
+.interactive-slide {
+    max-width: 460px !important;
+    width: 100%;
+}
+
+.interactive-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    height: auto;
 }
 
 /* Console Panel styling */

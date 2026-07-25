@@ -149,34 +149,57 @@
                 <div class="slide-content glass-card wide-card interactive-slide">
                     <span class="badge">Trực Quan 3D</span>
                     <h2>Mô Phỏng Thực Tế Quy Trình Hoạt Động</h2>
-                    <p class="slide-intro-text">Click các bước theo thứ tự từ 1 đến 4 dưới đây để xem cách dữ liệu di chuyển trực quan trong không gian 3D. Kéo chuột để xoay.</p>
+                    <p class="slide-intro-text">Bấm các bước để chạy quy trình. Kéo chuột vào vùng trống bên phải để xoay không gian 3D.</p>
                     
                     <div class="interactive-container">
                         <!-- Controls panel -->
                         <div class="control-panel stepper-panel">
                             <button class="sim-btn active-step" id="btn-step1">
-                                <span class="btn-icon">📥</span>
+                                <span class="btn-icon">
+                                    <svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                                        <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+                                    </svg>
+                                </span>
                                 <div class="btn-info">
                                     <span class="btn-title">Bước 1: Gửi Link & Node ID</span>
                                     <span class="btn-sub">User -> AI Client</span>
                                 </div>
                             </button>
                             <button class="sim-btn" id="btn-step2" disabled>
-                                <span class="btn-icon">⚙️</span>
+                                <span class="btn-icon">
+                                    <svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <circle cx="12" cy="12" r="3"></circle>
+                                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                                    </svg>
+                                </span>
                                 <div class="btn-info">
                                     <span class="btn-title">Bước 2: AI Gọi Figma MCP</span>
                                     <span class="btn-sub">AI Client -> Server -> API</span>
                                 </div>
                             </button>
                             <button class="sim-btn" id="btn-step3" disabled>
-                                <span class="btn-icon">☁️</span>
+                                <span class="btn-icon">
+                                    <svg class="svg-icon-figma" width="18" height="27" viewBox="0 0 20 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M5 10C5 7.23858 7.23858 5 10 5H15V10H10C7.23858 10 5 7.23858 5 10Z" fill="#F24E1E"/>
+                                        <path d="M15 10C17.7614 10 20 7.23858 20 5C20 2.23858 17.7614 0 15 0C12.2386 0 10 2.23858 10 5V10H15Z" fill="#FF7262"/>
+                                        <path d="M5 20C5 17.2386 7.23858 15 10 15H15V20H10C7.23858 20 5 17.2386 5 20Z" fill="#A259FF"/>
+                                        <path d="M15 20C17.7614 20 20 17.2386 20 15V20H15Z" fill="#1ABC9C"/>
+                                        <path d="M10 25C10 22.2386 7.23858 20 5 20C2.23858 20 0 22.2386 0 25C0 27.7614 2.23858 30 5 30C7.23858 30 10 27.7614 10 25Z" fill="#0ACF83"/>
+                                    </svg>
+                                </span>
                                 <div class="btn-info">
                                     <span class="btn-title">Bước 3: Trả Về Dữ Liệu Node</span>
                                     <span class="btn-sub">Figma API -> AI Client</span>
                                 </div>
                             </button>
                             <button class="sim-btn" id="btn-step4" disabled>
-                                <span class="btn-icon">💻</span>
+                                <span class="btn-icon">
+                                    <svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <polyline points="16 18 22 12 16 6"></polyline>
+                                        <polyline points="8 6 2 12 8 18"></polyline>
+                                    </svg>
+                                </span>
                                 <div class="btn-info">
                                     <span class="btn-title">Bước 4: Phân Tích & Ghi Code</span>
                                     <span class="btn-sub">AI -> Ghi Vào Workspace</span>

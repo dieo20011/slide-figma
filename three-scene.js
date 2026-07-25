@@ -12,7 +12,7 @@ const cameraTargets = [
     { pos: { x: -3.5, y: 0.8, z: 4.5 }, look: { x: -3, y: 0, z: 0 } },  // Slide 1: What is Figma MCP (Focus Client)
     { pos: { x: 0, y: 4, z: 6 }, look: { x: 0, y: 0, z: 0 } },         // Slide 2: Architecture
     { pos: { x: 1.5, y: 1.5, z: 4.5 }, look: { x: 1, y: 0, z: 0 } },    // Slide 3: Data Flow (Focus Cloud & Server)
-    { pos: { x: 0, y: 1.5, z: 7 }, look: { x: 0, y: 0, z: 0 } },        // Slide 4: Interactive Simulator (User control)
+    { pos: { x: 1.5, y: 1.2, z: 6.8 }, look: { x: 1.8, y: 0, z: 0 } },  // Slide 4: Interactive Simulator (Shifted right)
     { pos: { x: 2.5, y: -0.8, z: 5 }, look: { x: 0, y: 0, z: 0 } }     // Slide 5: Summary
 ];
 
