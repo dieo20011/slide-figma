@@ -148,32 +148,42 @@
             <section class="slide" id="slide-4">
                 <div class="slide-content glass-card wide-card interactive-slide">
                     <span class="badge">Trực Quan 3D</span>
-                    <h2>Mô Phỏng Luồng Figma MCP</h2>
-                    <p class="slide-intro-text">Click các nút dưới đây để kích hoạt luồng dữ liệu 3D từ Figma Cloud API về AI Client và ghi vào code. Kéo chuột để xoay.</p>
+                    <h2>Mô Phỏng Thực Tế Quy Trình Hoạt Động</h2>
+                    <p class="slide-intro-text">Click các bước theo thứ tự từ 1 đến 4 dưới đây để xem cách dữ liệu di chuyển trực quan trong không gian 3D. Kéo chuột để xoay.</p>
                     
                     <div class="interactive-container">
                         <!-- Controls panel -->
-                        <div class="control-panel">
-                            <button class="sim-btn" id="btn-resource">
-                                <span class="btn-icon">📦</span>
+                        <div class="control-panel stepper-panel">
+                            <button class="sim-btn active-step" id="btn-step1">
+                                <span class="btn-icon">📥</span>
                                 <div class="btn-info">
-                                    <span class="btn-title">1. Đọc Cấu Trúc Figma Layer</span>
-                                    <span class="btn-sub">Fetch figma.com/files/...</span>
+                                    <span class="btn-title">Bước 1: Gửi Link & Node ID</span>
+                                    <span class="btn-sub">User -> AI Client</span>
                                 </div>
                             </button>
-                            <button class="sim-btn" id="btn-tool">
-                                <span class="btn-icon">🎨</span>
+                            <button class="sim-btn" id="btn-step2" disabled>
+                                <span class="btn-icon">⚙️</span>
                                 <div class="btn-info">
-                                    <span class="btn-title">2. Ánh Xạ CSS/Color Token</span>
-                                    <span class="btn-sub">Dịch mã màu & auto-layout</span>
+                                    <span class="btn-title">Bước 2: AI Gọi Figma MCP</span>
+                                    <span class="btn-sub">AI Client -> Server -> API</span>
                                 </div>
                             </button>
-                            <button class="sim-btn" id="btn-prompt">
+                            <button class="sim-btn" id="btn-step3" disabled>
+                                <span class="btn-icon">☁️</span>
+                                <div class="btn-info">
+                                    <span class="btn-title">Bước 3: Trả Về Dữ Liệu Node</span>
+                                    <span class="btn-sub">Figma API -> AI Client</span>
+                                </div>
+                            </button>
+                            <button class="sim-btn" id="btn-step4" disabled>
                                 <span class="btn-icon">💻</span>
                                 <div class="btn-info">
-                                    <span class="btn-title">3. Sinh Code Angular/Vite</span>
-                                    <span class="btn-sub">Ghi trực tiếp vào workspace</span>
+                                    <span class="btn-title">Bước 4: Phân Tích & Ghi Code</span>
+                                    <span class="btn-sub">AI -> Ghi Vào Workspace</span>
                                 </div>
+                            </button>
+                            <button class="reset-btn" id="btn-reset" style="display: none;">
+                                🔄 Chạy Lại Mô Phỏng
                             </button>
                         </div>
 
@@ -183,10 +193,10 @@
                                 <span class="dot red"></span>
                                 <span class="dot yellow"></span>
                                 <span class="dot green"></span>
-                                <span class="console-title">Figma MCP Traffic Monitor</span>
+                                <span class="console-title">Figma MCP Workflow Monitor</span>
                             </div>
                             <div class="console-body" id="console-output">
-                                <div class="log-line system">// Hệ thống Figma MCP sẵn sàng. Click các bước để kiểm tra log...</div>
+                                <div class="log-line system">// Hệ thống Figma MCP sẵn sàng. Bắt đầu bằng cách bấm [Bước 1]...</div>
                             </div>
                         </div>
                     </div>

@@ -1,9 +1,10 @@
-// Three.js 3D Background & Animation Logic (Figma MCP Focus)
+// Three.js 3D Background & Animation Logic (Figma MCP Stepper Focus)
 
 let scene, camera, renderer, controls;
 let clientNode, mcpServerNode, figmaCloudNode, codeWorkspaceNode;
 let connections = {}; // Store curve paths
 let backgroundParticles;
+let activePackets = []; // Track spawned packets for cleanup
 
 // Camera targets for each slide (0-indexed)
 const cameraTargets = [
@@ -305,6 +306,7 @@ function animatePacket(curveName, color, duration, callback) {
     const pMat = new THREE.MeshBasicMaterial({ color: color });
     const packet = new THREE.Mesh(pGeo, pMat);
     scene.add(packet);
+    activePackets.push(packet);
 
     const pLight = new THREE.PointLight(color, 1.5, 2);
     packet.add(pLight);
@@ -320,6 +322,39 @@ function animatePacket(curveName, color, duration, callback) {
         },
         onComplete: () => {
             scene.remove(packet);
+            activePackets = activePackets.filter(p => p !== packet);
+            pGeo.dispose();
+            pMat.dispose();
+            if (typeof callback === 'function') callback();
+        }
+    });
+}
+
+// Custom animation starting from Camera viewport to a target position
+function animatePacketFromViewport(targetPos, color, duration, callback) {
+    const pGeo = new THREE.SphereGeometry(0.08, 16, 16);
+    const pMat = new THREE.MeshBasicMaterial({ color: color });
+    const packet = new THREE.Mesh(pGeo, pMat);
+    
+    // Position packet in front of the camera
+    const startPos = new THREE.Vector3(0, 0, -2);
+    startPos.applyMatrix4(camera.matrixWorld); // project into world space in front of camera
+    packet.position.copy(startPos);
+    scene.add(packet);
+    activePackets.push(packet);
+
+    const pLight = new THREE.PointLight(color, 1.5, 2);
+    packet.add(pLight);
+
+    gsap.to(packet.position, {
+        x: targetPos.x,
+        y: targetPos.y,
+        z: targetPos.z,
+        duration: duration,
+        ease: "power2.out",
+        onComplete: () => {
+            scene.remove(packet);
+            activePackets = activePackets.filter(p => p !== packet);
             pGeo.dispose();
             pMat.dispose();
             if (typeof callback === 'function') callback();
@@ -328,55 +363,71 @@ function animatePacket(curveName, color, duration, callback) {
 }
 
 window.trigger3DAnimation = function(actionType) {
-    if (actionType === 'figma-fetch') {
-        // Step 1: Client -> MCP Server
+    if (actionType === 'step-1') {
+        // Step 1: User/Interface (viewport) sends link & node_id to AI Client
+        animatePacketFromViewport(clientNode.position, 0x00f0ff, 0.7, () => {
+            gsap.to(clientNode.scale, { x: 1.25, y: 1.25, z: 1.25, duration: 0.1, yoyo: true, repeat: 1 });
+        });
+    } 
+    else if (actionType === 'step-2') {
+        // Step 2: AI Client sends request to local MCP server -> Figma Cloud API
         animatePacket('client-to-mcp', 0x00f0ff, 0.4, () => {
             gsap.to(mcpServerNode.scale, { x: 1.25, y: 1.25, z: 1.25, duration: 0.08, yoyo: true, repeat: 1 });
             
-            // Step 2: MCP Server -> Figma Cloud API
             animatePacket('mcp-to-figma', 0xbd5eff, 0.5, () => {
                 gsap.to(figmaCloudNode.scale, { x: 1.2, y: 1.2, z: 1.2, duration: 0.1, yoyo: true, repeat: 1 });
-                
-                // Step 3: Figma Cloud API -> MCP Server
-                animatePacket('figma-to-mcp', 0xff4b2b, 0.5, () => {
-                    gsap.to(mcpServerNode.scale, { x: 1.25, y: 1.25, z: 1.25, duration: 0.08, yoyo: true, repeat: 1 });
-                    
-                    // Step 4: MCP Server -> Client
-                    animatePacket('mcp-to-client', 0x00f5d4, 0.4, () => {
-                        gsap.to(clientNode.scale, { x: 1.15, y: 1.15, z: 1.15, duration: 0.1, yoyo: true, repeat: 1 });
-                    });
-                });
             });
         });
     } 
-    else if (actionType === 'parse-token') {
-        // Pulse Client internally (local compilation / computation)
-        gsap.to(clientNode.scale, { x: 1.25, y: 1.25, z: 1.25, duration: 0.15, yoyo: true, repeat: 3 });
-        
-        // Spin the client outer ring super fast temporarily
-        const orbitRing = clientNode.children[2];
-        gsap.to(orbitRing.rotation, {
-            z: orbitRing.rotation.z + Math.PI * 4,
-            duration: 1.0,
-            ease: "power2.out"
+    else if (actionType === 'step-3') {
+        // Step 3: Figma Cloud API returns design JSON -> MCP Server -> AI Client
+        animatePacket('figma-to-mcp', 0xff4b2b, 0.5, () => {
+            gsap.to(mcpServerNode.scale, { x: 1.25, y: 1.25, z: 1.25, duration: 0.08, yoyo: true, repeat: 1 });
+            
+            animatePacket('mcp-to-client', 0x00f5d4, 0.4, () => {
+                gsap.to(clientNode.scale, { x: 1.15, y: 1.15, z: 1.15, duration: 0.1, yoyo: true, repeat: 1 });
+            });
         });
     } 
-    else if (actionType === 'code-output') {
-        // Step 1: Client -> Code Editor Node
-        animatePacket('client-to-code', 0x00f5d4, 0.7, () => {
-            gsap.to(codeWorkspaceNode.scale, { x: 1.3, y: 1.3, z: 1.3, duration: 0.1, yoyo: true, repeat: 1 });
-        });
+    else if (actionType === 'step-4') {
+        // Step 4: AI Client writes code to local workspace files
+        // Pulse AI Client internally for compilation
+        gsap.to(clientNode.scale, { x: 1.25, y: 1.25, z: 1.25, duration: 0.1, yoyo: true, repeat: 2 });
+        
+        setTimeout(() => {
+            animatePacket('client-to-code', 0x00f5d4, 0.7, () => {
+                gsap.to(codeWorkspaceNode.scale, { x: 1.3, y: 1.3, z: 1.3, duration: 0.1, yoyo: true, repeat: 1 });
+            });
+        }, 300);
+    }
+    else if (actionType === 'reset') {
+        // Clear active packets
+        activePackets.forEach(p => scene.remove(p));
+        activePackets = [];
+
+        // Reset scales
+        gsap.to(clientNode.scale, { x: 1, y: 1, z: 1, duration: 0.5 });
+        gsap.to(mcpServerNode.scale, { x: 1, y: 1, z: 1, duration: 0.5 });
+        gsap.to(figmaCloudNode.scale, { x: 1, y: 1, z: 1, duration: 0.5 });
+        gsap.to(codeWorkspaceNode.scale, { x: 1, y: 1, z: 1, duration: 0.5 });
     }
 };
 
-// Periodic auto-packets on Slide 3 (Data Flow)
+// Periodic auto-packets on Slide 3 (Data Flow) - visual loop representing figma connection
 let dataFlowInterval = null;
 function startAutoPackets() {
     if (dataFlowInterval) return;
     
     dataFlowInterval = setInterval(() => {
-        window.trigger3DAnimation('figma-fetch');
-    }, 3500);
+        // Run full cycle
+        animatePacket('client-to-mcp', 0.4, 0x00f0ff, () => {
+            animatePacket('mcp-to-figma', 0xbd5eff, 0.4, () => {
+                animatePacket('figma-to-mcp', 0xff4b2b, 0.4, () => {
+                    animatePacket('mcp-to-client', 0x00f5d4, 0.4);
+                });
+            });
+        });
+    }, 4500);
 }
 
 function stopAutoPackets() {
@@ -457,9 +508,7 @@ function animate(time) {
     }
     
     if (figmaCloudNode) {
-        // Slow rotation of layers
         figmaCloudNode.rotation.y += speedFactor * 0.6;
-        // Hover float animation
         figmaCloudNode.position.y = 1.6 + Math.sin(time * 0.0015) * 0.06;
     }
     
