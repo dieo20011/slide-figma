@@ -88,19 +88,24 @@
                     <h2>Kiến Trúc Figma MCP</h2>
                     <div class="architecture-grid">
                         <div class="arch-box">
-                            <div class="arch-icon host-icon">🤖</div>
-                            <h3>1. AI Host Client</h3>
-                            <p>VS Code, Cursor, hoặc Codex nhận diện link Figma chứa <code>fileKey</code> và <code>node-id</code> từ câu lệnh (prompt) của người dùng.</p>
+                            <div class="arch-icon host-icon">💻</div>
+                            <h3>1. Máy Tính (Client / IDE)</h3>
+                            <p>Ứng dụng cục bộ như Cursor, VS Code. Nơi người dùng soạn thảo code và gửi yêu cầu, trực tiếp lưu trữ mã nguồn local.</p>
                         </div>
                         <div class="arch-box">
-                            <div class="arch-icon client-icon">⚙️</div>
-                            <h3>2. Figma MCP Server</h3>
-                            <p>Một tiến trình cục bộ (qua <code>npx figma-developer-mcp</code>) nhận lệnh JSON-RPC, dùng token môi trường gửi REST request.</p>
+                            <div class="arch-icon client-icon">🧠</div>
+                            <h3>2. Mô Hình AI (Model)</h3>
+                            <p>Bộ não LLM (như Claude 3.5) phân tích yêu cầu của người dùng, đưa ra suy luận và quyết định khi nào cần gọi tool để đọc thiết kế.</p>
                         </div>
                         <div class="arch-box">
-                            <div class="arch-icon server-icon">☁️</div>
-                            <h3>3. Figma Cloud API</h3>
-                            <p>Server của Figma tiếp nhận request, trả về JSON của File/Node thiết kế. MCP Server lọc nhiễu rồi chuyển cho AI Client.</p>
+                            <div class="arch-icon server-icon">⚙️</div>
+                            <h3>3. Server AI (MCP Server)</h3>
+                            <p>Tiến trình Figma MCP Server chạy cục bộ, làm cầu nối bảo mật gọi API ngoài bằng token môi trường local.</p>
+                        </div>
+                        <div class="arch-box">
+                            <div class="arch-icon server-icon" style="background: rgba(255, 114, 98, 0.1); border-color: rgba(255, 114, 98, 0.2); color: #ff7262;">☁️</div>
+                            <h3>4. Figma API (Figma Cloud)</h3>
+                            <p>Nền tảng Figma lưu trữ file thiết kế gốc, cung cấp dữ liệu Node dưới dạng cấu trúc JSON.</p>
                         </div>
                     </div>
                 </div>
@@ -147,9 +152,10 @@
             <!-- Slide 5: Interactive Simulator -->
             <section class="slide" id="slide-4">
                 <div class="slide-content glass-card wide-card interactive-slide">
+                    <button class="collapse-toggle" id="btn-collapse" title="Thu gọn/Mở rộng bảng điều khiển">◀</button>
                     <span class="badge">Trực Quan 3D</span>
-                    <h2>Mô Phỏng Thực Tế Quy Trình Hoạt Động</h2>
-                    <p class="slide-intro-text">Bấm các bước để chạy quy trình. Kéo chuột vào vùng trống bên phải để xoay không gian 3D.</p>
+                    <h2>Mô Phỏng Đúng Kiến Trúc Luồng Hoạt Động</h2>
+                    <p class="slide-intro-text">Bấm từng bước bên dưới để xem chu trình giao tiếp chuẩn giữa Máy tính, AI Model, MCP Server và Figma Cloud.</p>
                     
                     <div class="interactive-container">
                         <!-- Controls panel -->
@@ -157,25 +163,25 @@
                             <button class="sim-btn active-step" id="btn-step1">
                                 <span class="btn-icon">
                                     <svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                        <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
-                                        <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+                                        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
                                     </svg>
                                 </span>
                                 <div class="btn-info">
-                                    <span class="btn-title">Bước 1: Gửi Link & Node ID</span>
-                                    <span class="btn-sub">User -> AI Client</span>
+                                    <span class="btn-title">Bước 1: Gửi Prompt & Link</span>
+                                    <span class="btn-sub">Máy Tính ➔ AI Model</span>
                                 </div>
                             </button>
                             <button class="sim-btn" id="btn-step2" disabled>
                                 <span class="btn-icon">
                                     <svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                        <circle cx="12" cy="12" r="3"></circle>
-                                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                                        <polyline points="16 3 21 3 21 8"></polyline>
+                                        <line x1="10" y1="14" x2="21" y2="3"></line>
+                                        <path d="M21 16v5a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5"></path>
                                     </svg>
                                 </span>
                                 <div class="btn-info">
-                                    <span class="btn-title">Bước 2: AI Gọi Figma MCP</span>
-                                    <span class="btn-sub">AI Client -> Server -> API</span>
+                                    <span class="btn-title">Bước 2: AI Gọi Tool Đọc Figma</span>
+                                    <span class="btn-sub">AI ➔ Máy Tính ➔ MCP Server</span>
                                 </div>
                             </button>
                             <button class="sim-btn" id="btn-step3" disabled>
@@ -189,8 +195,8 @@
                                     </svg>
                                 </span>
                                 <div class="btn-info">
-                                    <span class="btn-title">Bước 3: Trả Về Dữ Liệu Node</span>
-                                    <span class="btn-sub">Figma API -> AI Client</span>
+                                    <span class="btn-title">Bước 3: Truy Vấn Thiết Kế</span>
+                                    <span class="btn-sub">MCP Server ➔ Figma ➔ Máy Tính</span>
                                 </div>
                             </button>
                             <button class="sim-btn" id="btn-step4" disabled>
@@ -201,8 +207,8 @@
                                     </svg>
                                 </span>
                                 <div class="btn-info">
-                                    <span class="btn-title">Bước 4: Phân Tích & Ghi Code</span>
-                                    <span class="btn-sub">AI -> Ghi Vào Workspace</span>
+                                    <span class="btn-title">Bước 4: AI Sinh & Ghi Code</span>
+                                    <span class="btn-sub">AI ➔ Máy Tính (Write File)</span>
                                 </div>
                             </button>
                             <button class="reset-btn" id="btn-reset" style="display: none;">
@@ -216,7 +222,7 @@
                                 <span class="dot red"></span>
                                 <span class="dot yellow"></span>
                                 <span class="dot green"></span>
-                                <span class="console-title">Figma MCP Workflow Monitor</span>
+                                <span class="console-title">Figma MCP Protocol Monitor</span>
                             </div>
                             <div class="console-body" id="console-output">
                                 <div class="log-line system">// Hệ thống Figma MCP sẵn sàng. Bắt đầu bằng cách bấm [Bước 1]...</div>

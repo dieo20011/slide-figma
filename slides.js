@@ -112,10 +112,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function resetStepper() {
-        // Clear logs
         consoleOutput.innerHTML = '<div class="log-line system">// Hệ thống Figma MCP sẵn sàng. Bắt đầu bằng cách bấm [Bước 1]...</div>';
         
-        // Buttons state reset
         btnStep1.disabled = false;
         btnStep1.classList.add('active-step');
         
@@ -135,15 +133,15 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Step 1: User sends Link containing Node ID to AI
+    // Step 1: User prompts IDE -> sends to AI Model
     btnStep1.addEventListener('click', () => {
         btnStep1.classList.remove('active-step');
         btnStep1.disabled = true;
         
-        appendLog(`USER: "Hãy đọc thiết kế và code giao diện Angular cho frame này: https://www.figma.com/design/Fdgx5QSeVjX65cvS4R08sS/Header?node-id=7850-46251"`, 'client-req');
-        appendLog(`AI CLIENT: Nhận lệnh. Trích xuất File Key: 'Fdgx5QSeVjX65cvS4R08sS', Node ID: '7850-46251'.`, 'system');
+        appendLog(`USER (IDE): "Hãy sinh code Angular cho frame thiết kế: https://www.figma.com/design/Fdgx5QSeVjX65cvS4R08sS/Header?node-id=7850-46251"`, 'client-req');
+        appendLog(`IDE -> AI (Model): [Gửi Prompt kèm danh sách Tool khả dụng của Figma MCP]`, 'system');
         
-        // Trigger 3D animation (User -> AI Client)
+        // Trigger 3D animation (Computer -> AI Model)
         if (typeof window.trigger3DAnimation === 'function') {
             window.trigger3DAnimation('step-1');
         }
@@ -151,20 +149,20 @@ document.addEventListener('DOMContentLoaded', () => {
         setTimeout(() => {
             btnStep2.disabled = false;
             btnStep2.classList.add('active-step');
-            appendLog(`// Bước 1 Hoàn Tất. Bấm [Bước 2: AI Gọi Figma MCP] để AI liên kết với Server...`, 'system');
+            appendLog(`// Bước 1 Hoàn Tất. Bấm [Bước 2: AI Gọi Tool Đọc Figma] để xem AI yêu cầu gọi tool...`, 'system');
         }, 1200);
     });
 
-    // Step 2: AI Client calls local Figma MCP server -> Figma Cloud API
+    // Step 2: AI Model instructs IDE to call tool -> local MCP Server
     btnStep2.addEventListener('click', () => {
         btnStep2.classList.remove('active-step');
         btnStep2.disabled = true;
         
-        appendLog(`AI CLIENT -> FIGMA MCP: Gửi yêu cầu JSON-RPC "resources/read"`, 'client-req');
-        appendLog(`Payload: { uri: "figma://file/Fdgx5QSeVjX65cvS4R08sS/node?id=7850-46251" }`, 'system');
-        appendLog(`FIGMA MCP -> FIGMA CLOUD: Gửi HTTPS GET "https://api.figma.com/v1/files/Fdgx5QSeVjX65cvS4R08sS/nodes?ids=7850-46251" (Dùng FIGMA_API_KEY bảo mật)`, 'system');
+        appendLog(`AI (Model) -> IDE: Yêu cầu gọi tool (tool_call): "figma/get_node_data"`, 'server-resp');
+        appendLog(`Parameters: { fileKey: "Fdgx5QSeVjX65cvS4R08sS", nodeIds: ["7850-46251"] }`, 'system');
+        appendLog(`IDE -> FIGMA MCP: Chuyển tiếp yêu cầu gọi tool cục bộ qua StdIO.`, 'client-req');
 
-        // Trigger 3D animation (AI Client -> MCP Server -> Figma Cloud)
+        // Trigger 3D animation (AI Model -> Computer -> MCP Server)
         if (typeof window.trigger3DAnimation === 'function') {
             window.trigger3DAnimation('step-2');
         }
@@ -172,19 +170,20 @@ document.addEventListener('DOMContentLoaded', () => {
         setTimeout(() => {
             btnStep3.disabled = false;
             btnStep3.classList.add('active-step');
-            appendLog(`// Bước 2 Hoàn Tất. Bấm [Bước 3: Trả Về Dữ Liệu Node] để xem thiết kế JSON Figma...`, 'system');
+            appendLog(`// Bước 2 Hoàn Tất. Bấm [Bước 3: Truy Vấn Thiết Kế] để lấy JSON thiết kế...`, 'system');
         }, 1200);
     });
 
-    // Step 3: Figma Cloud returns design JSON AST to AI Client
+    // Step 3: MCP Server calls Figma Cloud -> returns layout JSON to IDE
     btnStep3.addEventListener('click', () => {
         btnStep3.classList.remove('active-step');
         btnStep3.disabled = true;
         
-        appendLog(`FIGMA CLOUD -> FIGMA MCP: Trả về HTTP 200 OK với dữ liệu JSON AST.`, 'server-resp');
-        appendLog(`FIGMA MCP -> AI CLIENT: Trả về dữ liệu Node đã được trích xuất: { type: "FRAME", name: "HeaderBar", layoutMode: "HORIZONTAL", primaryAxisAlignItems: "SPACE_BETWEEN", counterAxisAlignItems: "CENTER", paddingLeft: 24, paddingRight: 24, itemSpacing: 16, fills: [{color: {r: 0.05, g: 0.06, b: 0.11}}] }`, 'system');
+        appendLog(`FIGMA MCP -> FIGMA CLOUD: GET https://api.figma.com/v1/files/Fdgx5QSeVjX65cvS4R08sS/nodes?ids=7850-46251`, 'client-req');
+        appendLog(`FIGMA CLOUD -> FIGMA MCP: Trả về JSON AST (Auto Layout, styles, colors)`, 'server-resp');
+        appendLog(`FIGMA MCP -> IDE: Trả về kết quả JSON Node cho IDE.`, 'system');
 
-        // Trigger 3D animation (Figma Cloud -> MCP Server -> AI Client)
+        // Trigger 3D animation (MCP Server -> Figma -> MCP Server -> Computer)
         if (typeof window.trigger3DAnimation === 'function') {
             window.trigger3DAnimation('step-3');
         }
@@ -192,22 +191,20 @@ document.addEventListener('DOMContentLoaded', () => {
         setTimeout(() => {
             btnStep4.disabled = false;
             btnStep4.classList.add('active-step');
-            appendLog(`// Bước 3 Hoàn Tất. Bấm [Bước 4: Phân Tích & Ghi Code] để xem cách sinh mã nguồn...`, 'system');
+            appendLog(`// Bước 3 Hoàn Tất. Bấm [Bước 4: AI Sinh & Ghi Code] để gửi dữ liệu cho AI sinh code...`, 'system');
         }, 1200);
     });
 
-    // Step 4: AI processes JSON AST & writes code to filesystem
+    // Step 4: IDE sends design JSON to AI Model -> AI generates code -> IDE writes to workspace
     btnStep4.addEventListener('click', () => {
         btnStep4.classList.remove('active-step');
         btnStep4.disabled = true;
         
-        appendLog(`AI CLIENT: Bắt đầu phân tích Auto Layout 'HORIZONTAL'...`, 'client-req');
-        appendLog(`AI CLIENT: Map 'SPACE_BETWEEN' & 'CENTER' -> CSS: "display: flex; justify-content: space-between; align-items: center;"`, 'system');
-        appendLog(`AI CLIENT: Dịch spacing 16px -> Tailwind 'gap-4'; padding 24px -> Tailwind 'px-6'.`, 'system');
-        appendLog(`AI CLIENT: Dịch màu RGB(0.05, 0.06, 0.11) -> Hex #0D0F1C. Khớp màu trùng khớp với Design Token: '--bg-primary-dark'.`, 'system');
-        appendLog(`AI CLIENT -> LOCAL FILESYSTEM: Ghi đè file code "src/app/header.component.ts"...`, 'client-req');
+        appendLog(`IDE -> AI (Model): [Gửi kết quả của tool_call để làm giàu ngữ cảnh]`, 'client-req');
+        appendLog(`AI (Model) -> IDE: Phân tích layout, map CSS variables và trả về mã nguồn Angular component hoàn chỉnh.`, 'server-resp');
+        appendLog(`IDE -> LOCAL FILESYSTEM: Ghi đè file code "src/app/header.component.ts"...`, 'client-req');
 
-        // Trigger 3D animation (AI Client -> Workspace Code Editor)
+        // Trigger 3D animation (Computer -> AI Model -> Computer)
         if (typeof window.trigger3DAnimation === 'function') {
             window.trigger3DAnimation('step-4');
         }
@@ -215,11 +212,26 @@ document.addEventListener('DOMContentLoaded', () => {
         setTimeout(() => {
             appendLog(`LOCAL FILESYSTEM: Tạo file src/app/header.component.ts thành công!`, 'server-resp');
             appendLog(`MÃ NGUỒN ANGULAR SINH RA:\n@Component({\n  selector: 'tds-header',\n  template: '<div class="flex justify-between items-center px-6 gap-4 bg-primary-dark"><ng-content></ng-content></div>'\n})`, 'system');
-            appendLog(`// QUY TRÌNH HOÀN THÀNH! Bản thiết kế Figma đã được chuyển đổi thành code thực tế nằm trong workspace của bạn.`, 'server-resp');
+            appendLog(`// QUY TRÌNH HOÀN THÀNH! Bản thiết kế Figma đã được biên dịch thành code và hiển thị thành công.`, 'server-resp');
             
             btnReset.style.display = 'block';
         }, 1500);
     });
 
     btnReset.addEventListener('click', resetStepper);
+
+    // Slide Collapse/Expand Toggle
+    const btnCollapse = document.getElementById('btn-collapse');
+    const interactiveSlide = document.querySelector('.interactive-slide');
+    
+    btnCollapse.addEventListener('click', () => {
+        interactiveSlide.classList.toggle('collapsed');
+        if (interactiveSlide.classList.contains('collapsed')) {
+            btnCollapse.innerText = '▶';
+            btnCollapse.title = 'Mở rộng bảng điều khiển';
+        } else {
+            btnCollapse.innerText = '◀';
+            btnCollapse.title = 'Thu gọn bảng điều khiển';
+        }
+    });
 });
