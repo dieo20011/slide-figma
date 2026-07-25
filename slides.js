@@ -1,4 +1,4 @@
-// Slides Controller Logic
+// Slides Controller Logic (Figma MCP Focused)
 
 document.addEventListener('DOMContentLoaded', () => {
     const slides = document.querySelectorAll('.slide');
@@ -110,50 +110,44 @@ document.addEventListener('DOMContentLoaded', () => {
         consoleOutput.scrollTop = consoleOutput.scrollHeight;
     }
 
-    function handleSimulateAction(actionType, label, method, params, mockResponse) {
-        appendLog(`CLIENT -> SERVER: Gửi yêu cầu JSON-RPC "${method}"...`, 'client-req');
-        appendLog(`Payload: ${JSON.stringify(params)}`, 'system');
-        
-        // Trigger 3D path particle animation
-        if (typeof window.trigger3DAnimation === 'function') {
-            window.trigger3DAnimation(actionType);
-        }
-        
-        // Simulate networking delay
-        setTimeout(() => {
-            appendLog(`SERVER -> CLIENT: Trả về kết quả JSON-RPC cho "${method}"`, 'server-resp');
-            appendLog(`Kết quả: ${JSON.stringify(mockResponse)}`, 'system');
-            appendLog(`// Luồng xử lý hoàn thành cho: ${label}`, 'system');
-        }, 1200);
-    }
-
     btnResource.addEventListener('click', () => {
-        handleSimulateAction(
-            'resource',
-            'Đọc Resource File/DB',
-            'resources/read',
-            { uri: 'file:///D:/Luan/slide/README.md' },
-            { contents: [{ uri: 'file:///D:/Luan/slide/README.md', text: '# slide-figma', mimeType: 'text/markdown' }] }
-        );
+        appendLog(`CLIENT -> MCP: resources/read { uri: "figma://file/Fdgx5QSeVjX65cvS4R08sS/node?id=7850-46251" }`, 'client-req');
+        
+        if (typeof window.trigger3DAnimation === 'function') {
+            window.trigger3DAnimation('figma-fetch');
+        }
+
+        setTimeout(() => {
+            appendLog(`MCP -> CLIENT: Trả về cấu trúc JSON Node thành công.`, 'server-resp');
+            appendLog(`JSON AST: { type: "FRAME", name: "CardInfo", layoutMode: "VERTICAL", itemSpacing: 12, paddingLeft: 16, fills: [{ color: {r:0.05, g:0.06, b:0.11} }] }`, 'system');
+        }, 1000);
     });
 
     btnTool.addEventListener('click', () => {
-        handleSimulateAction(
-            'tool',
-            'Thực thi Tool (Run CLI)',
-            'tools/call',
-            { name: 'run_command', arguments: { command: 'git status' } },
-            { content: [{ type: 'text', text: 'On branch main\nYour branch is up to date.\nnothing to commit, working tree clean' }] }
-        );
+        appendLog(`CLIENT -> SYSTEM: Tiến hành phân tích layout & khớp CSS token...`, 'client-req');
+        
+        if (typeof window.trigger3DAnimation === 'function') {
+            window.trigger3DAnimation('parse-token');
+        }
+
+        setTimeout(() => {
+            appendLog(`SYSTEM: Dịch màu RGB(0.05, 0.06, 0.11) -> Hex: #0D0F1C. Khớp màu với token background: --bg-card-dark.`, 'system');
+            appendLog(`SYSTEM: Figma Auto Layout "VERTICAL" -> CSS: "display: flex; flex-direction: column;"`, 'system');
+            appendLog(`SYSTEM: Figma Spacing "itemSpacing: 12" -> Tailwind: "gap-3"`, 'system');
+            appendLog(`SYSTEM: Figma Padding "paddingLeft: 16" -> Tailwind: "pl-4"`, 'server-resp');
+        }, 1000);
     });
 
     btnPrompt.addEventListener('click', () => {
-        handleSimulateAction(
-            'prompt',
-            'Nạp Prompt Template',
-            'prompts/get',
-            { name: 'explain-mcp', arguments: { topic: 'data flow' } },
-            { description: 'Mẫu prompt giải thích luồng hoạt động', messages: [{ role: 'user', content: 'Hãy giải thích chi tiết luồng xử lý của MCP.' }] }
-        );
+        appendLog(`CLIENT -> LOCAL: Ghi đè file code "src/components/card.component.ts"...`, 'client-req');
+        
+        if (typeof window.trigger3DAnimation === 'function') {
+            window.trigger3DAnimation('code-output');
+        }
+
+        setTimeout(() => {
+            appendLog(`LOCAL: Khởi tạo file src/components/card.component.ts thành công!`, 'server-resp');
+            appendLog(`CODE: @Component({\n  selector: 'tds-card',\n  template: '<div class="flex flex-col gap-3 pl-4 bg-dark-card"><ng-content></ng-content></div>'\n})`, 'system');
+        }, 1000);
     });
 });

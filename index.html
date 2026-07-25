@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Model Context Protocol (MCP) - Hướng dẫn chi tiết</title>
+    <title>Figma MCP - Hướng dẫn & Cách thức hoạt động</title>
     <link rel="stylesheet" href="style.css">
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -23,7 +23,7 @@
         <!-- Presentation Title / Header -->
         <header class="main-header">
             <div class="logo">
-                <span class="logo-mcp">MCP</span>
+                <span class="logo-mcp">FIGMA MCP</span>
                 <span class="logo-divider"></span>
                 <span class="logo-desc">Model Context Protocol</span>
             </div>
@@ -38,41 +38,41 @@
             <!-- Slide 1: Title -->
             <section class="slide active" id="slide-0">
                 <div class="slide-content glass-card intro-card">
-                    <span class="badge">Open Standard Protocol</span>
-                    <h1>Model Context<br><span class="gradient-text">Protocol</span></h1>
-                    <p class="subtitle">Chuẩn kết nối mở giúp đồng bộ hóa dữ liệu và công cụ cho các mô hình AI (LLMs)</p>
+                    <span class="badge">Figma-to-Code Workflow</span>
+                    <h1>Figma MCP<br><span class="gradient-text">Developer</span></h1>
+                    <p class="subtitle">Đồng bộ hóa trực tiếp thiết kế Figma và mã nguồn thông qua giao thức Model Context Protocol</p>
                     <div class="author-info">
                         <span class="author-icon">⚡</span>
-                        <span>Nhấn Phím Mũi Tên Phải (→) hoặc Space để bắt đầu</span>
+                        <span>Nhấn Phím Mũi Tên Phải (→) hoặc Space để xem luồng xử lý</span>
                     </div>
                 </div>
             </section>
 
-            <!-- Slide 2: What is MCP? -->
+            <!-- Slide 2: What is Figma MCP? -->
             <section class="slide" id="slide-1">
                 <div class="slide-content glass-card">
                     <span class="badge">Khái Niệm</span>
-                    <h2>MCP Là Gì?</h2>
+                    <h2>Figma MCP Là Gì?</h2>
                     <div class="grid-content">
                         <div class="text-block">
-                            <p><strong>Model Context Protocol (MCP)</strong> là một giao thức mã nguồn mở do <strong>Anthropic</strong> phát triển, đóng vai trò như một "cổng USB-C" tiêu chuẩn cho các mô hình ngôn ngữ lớn.</p>
+                            <p><strong>Figma MCP Server</strong> là một cổng kết nối cho phép các mô hình AI (như Claude, Cursor) đọc trực tiếp cấu trúc thiết kế từ Figma Cloud API mà không cần người dùng phải export ảnh hay copy code thủ công.</p>
                             <ul>
                                 <li>
-                                    <span class="li-icon">🔌</span>
+                                    <span class="li-icon">🎨</span>
                                     <div>
-                                        <strong>Kết nối hợp nhất:</strong> Thay vì xây dựng tích hợp riêng lẻ cho từng IDE và công cụ, MCP định nghĩa một chuẩn chung duy nhất.
+                                        <strong>Đọc hiểu cấu trúc thực tế:</strong> AI không chỉ nhìn hình ảnh, mà đọc được cấu trúc dạng cây (JSON AST) bao gồm Layer, Frame, Auto Layout, Typography và Màu sắc.
                                     </div>
                                 </li>
                                 <li>
-                                    <span class="li-icon">🛡️</span>
+                                    <span class="li-icon">🔑</span>
                                     <div>
-                                        <strong>Bảo mật tối đa:</strong> Giữ quyền kiểm soát dữ liệu tại máy Client, không đẩy dữ liệu nhạy cảm trực tiếp lên đám mây không tin cậy.
+                                        <strong>Token bảo mật cục bộ:</strong> Sử dụng <code>FIGMA_API_KEY</code> lưu trong biến môi trường cá nhân. AI Client tự gọi API an toàn, không lưu token vào repo hoặc chat.
                                     </div>
                                 </li>
                                 <li>
-                                    <span class="li-icon">🔄</span>
+                                    <span class="li-icon">🎯</span>
                                     <div>
-                                        <strong>Hai chiều linh hoạt:</strong> Cho phép AI đọc dữ liệu (Resources) và thực thi hành động (Tools).
+                                        <strong>Nhắm mục tiêu Node cụ thể:</strong> Truy xuất chính xác Frame được chọn thông qua link chứa <code>node-id</code> thay vì phải quét toàn bộ file thiết kế nặng nề.
                                     </div>
                                 </li>
                             </ul>
@@ -81,63 +81,63 @@
                 </div>
             </section>
 
-            <!-- Slide 3: Architecture -->
+            <!-- Slide 3: Figma MCP Architecture -->
             <section class="slide" id="slide-2">
                 <div class="slide-content glass-card wide-card">
                     <span class="badge">Kiến Trúc</span>
-                    <h2>Kiến Trúc 3 Thành Phần</h2>
+                    <h2>Kiến Trúc Figma MCP</h2>
                     <div class="architecture-grid">
                         <div class="arch-box">
-                            <div class="arch-icon host-icon">💻</div>
-                            <h3>1. MCP Host</h3>
-                            <p>Ứng dụng AI Client như Claude Desktop, Cursor, IDEs... Nơi người dùng trực tiếp tương tác và đưa ra yêu cầu.</p>
+                            <div class="arch-icon host-icon">🤖</div>
+                            <h3>1. AI Host Client</h3>
+                            <p>VS Code, Cursor, hoặc Codex nhận diện link Figma chứa <code>fileKey</code> và <code>node-id</code> từ câu lệnh (prompt) của người dùng.</p>
                         </div>
                         <div class="arch-box">
-                            <div class="arch-icon client-icon">🔄</div>
-                            <h3>2. MCP Client</h3>
-                            <p>Thành phần tích hợp bên trong Host, có nhiệm vụ thiết lập kết nối an toàn bảo mật, gửi/nhận lệnh JSON-RPC với Server.</p>
+                            <div class="arch-icon client-icon">⚙️</div>
+                            <h3>2. Figma MCP Server</h3>
+                            <p>Một tiến trình cục bộ (qua <code>npx figma-developer-mcp</code>) nhận lệnh JSON-RPC, dùng token môi trường gửi REST request.</p>
                         </div>
                         <div class="arch-box">
-                            <div class="arch-icon server-icon">⚙️</div>
-                            <h3>3. MCP Server</h3>
-                            <p>Các chương trình nhỏ chạy độc lập (NodeJS, Python...) cung cấp: <strong>Resources</strong> (dữ liệu), <strong>Tools</strong> (hành động) và <strong>Prompts</strong> (mẫu câu lệnh).</p>
+                            <div class="arch-icon server-icon">☁️</div>
+                            <h3>3. Figma Cloud API</h3>
+                            <p>Server của Figma tiếp nhận request, trả về JSON của File/Node thiết kế. MCP Server lọc nhiễu rồi chuyển cho AI Client.</p>
                         </div>
                     </div>
                 </div>
             </section>
 
-            <!-- Slide 4: Data flow -->
+            <!-- Slide 4: Data Processing Details -->
             <section class="slide" id="slide-3">
                 <div class="slide-content glass-card">
-                    <span class="badge">Luồng Xử Lý</span>
-                    <h2>Dữ Liệu Được Xử Lý Thế Nào?</h2>
+                    <span class="badge">Xử Lý Dữ Liệu</span>
+                    <h2>Dữ Liệu Được Dịch Sang Code Như Thế Nào?</h2>
                     <div class="flow-steps">
                         <div class="step-item">
                             <div class="step-num">1</div>
                             <div class="step-text">
-                                <h4>Yêu cầu từ Người Dùng</h4>
-                                <p>User nhập prompt (Ví dụ: "Đọc file code trong thư mục slide"). Host nhận dạng ngữ cảnh và gửi tín hiệu qua Client.</p>
+                                <h4>Phân Tích JSON Node Tree</h4>
+                                <p>Đọc cấu trúc cha-con từ Figma Node. Nhận dạng các layout flexbox (Figma Auto Layout) như direction, padding, gap để ánh xạ sang Flex CSS.</p>
                             </div>
                         </div>
                         <div class="step-item">
                             <div class="step-num">2</div>
                             <div class="step-text">
-                                <h4>Truy vấn MCP Server</h4>
-                                <p>Client chuyển đổi yêu cầu thành gói tin JSON-RPC, gửi đến MCP Server để truy xuất tài nguyên hoặc thực thi Tools.</p>
+                                <h4>Ánh Xạ Màu Sắc & CSS Token</h4>
+                                <p>Đọc kênh màu RGB/RGBA của Figma, chuyển đổi thành Hex. Đối chiếu với file config hệ thống màu (ví dụ: <code>tds-figma-color-mapping.md</code>) để chọn màu chuẩn.</p>
                             </div>
                         </div>
                         <div class="step-item">
                             <div class="step-num">3</div>
                             <div class="step-text">
-                                <h4>Đóng gói Ngữ Cảnh</h4>
-                                <p>Server xử lý dưới máy local (hoặc gọi API ngoài) rồi trả dữ liệu thô về Client. Client tích hợp dữ liệu này thành Context.</p>
+                                <h4>Dịch Thư Viện Component</h4>
+                                <p>AI nhận diện các Component Figma (Button, Input, Card) và so sánh với thư viện code có sẵn (TDS components) để reuse thay vì viết code HTML thô.</p>
                             </div>
                         </div>
                         <div class="step-item">
                             <div class="step-num">4</div>
                             <div class="step-text">
-                                <h4>Mô Hình Sinh Kết Quả</h4>
-                                <p>Client truyền Context đã làm giàu cho LLM. LLM trả về câu trả lời chính xác, thực tế cho người dùng.</p>
+                                <h4>Sinh Code & Ghi Vào Repo</h4>
+                                <p>AI Client tiến hành sinh file component hoàn chỉnh (Angular, React, HTML) và ghi trực tiếp vào thư mục mã nguồn thông qua file write tools.</p>
                             </div>
                         </div>
                     </div>
@@ -148,31 +148,31 @@
             <section class="slide" id="slide-4">
                 <div class="slide-content glass-card wide-card interactive-slide">
                     <span class="badge">Trực Quan 3D</span>
-                    <h2>Mô Phỏng Tương Tác MCP</h2>
-                    <p class="slide-intro-text">Click các nút dưới đây để xem cách luồng dữ liệu di chuyển trong hệ thống 3D. Kéo chuột để xoay camera 3D.</p>
+                    <h2>Mô Phỏng Luồng Figma MCP</h2>
+                    <p class="slide-intro-text">Click các nút dưới đây để kích hoạt luồng dữ liệu 3D từ Figma Cloud API về AI Client và ghi vào code. Kéo chuột để xoay.</p>
                     
                     <div class="interactive-container">
                         <!-- Controls panel -->
                         <div class="control-panel">
                             <button class="sim-btn" id="btn-resource">
-                                <span class="btn-icon">📁</span>
+                                <span class="btn-icon">📦</span>
                                 <div class="btn-info">
-                                    <span class="btn-title">Đọc Resource (File/DB)</span>
-                                    <span class="btn-sub">Yêu cầu dữ liệu tĩnh</span>
+                                    <span class="btn-title">1. Đọc Cấu Trúc Figma Layer</span>
+                                    <span class="btn-sub">Fetch figma.com/files/...</span>
                                 </div>
                             </button>
                             <button class="sim-btn" id="btn-tool">
-                                <span class="btn-icon">⚡</span>
+                                <span class="btn-icon">🎨</span>
                                 <div class="btn-info">
-                                    <span class="btn-title">Thực thi Tool (Run CLI)</span>
-                                    <span class="btn-sub">Chạy hành động có side-effect</span>
+                                    <span class="btn-title">2. Ánh Xạ CSS/Color Token</span>
+                                    <span class="btn-sub">Dịch mã màu & auto-layout</span>
                                 </div>
                             </button>
                             <button class="sim-btn" id="btn-prompt">
-                                <span class="btn-icon">💬</span>
+                                <span class="btn-icon">💻</span>
                                 <div class="btn-info">
-                                    <span class="btn-title">Nạp Prompt Template</span>
-                                    <span class="btn-sub">Tải cấu trúc câu lệnh mẫu</span>
+                                    <span class="btn-title">3. Sinh Code Angular/Vite</span>
+                                    <span class="btn-sub">Ghi trực tiếp vào workspace</span>
                                 </div>
                             </button>
                         </div>
@@ -183,10 +183,10 @@
                                 <span class="dot red"></span>
                                 <span class="dot yellow"></span>
                                 <span class="dot green"></span>
-                                <span class="console-title">JSON-RPC Traffic Log</span>
+                                <span class="console-title">Figma MCP Traffic Monitor</span>
                             </div>
                             <div class="console-body" id="console-output">
-                                <div class="log-line system">// Sẵn sàng mô phỏng. Hãy click một hành động phía bên trái...</div>
+                                <div class="log-line system">// Hệ thống Figma MCP sẵn sàng. Click các bước để kiểm tra log...</div>
                             </div>
                         </div>
                     </div>
@@ -196,21 +196,21 @@
             <!-- Slide 6: Summary / Benefits -->
             <section class="slide" id="slide-5">
                 <div class="slide-content glass-card">
-                    <span class="badge">Tổng Kết</span>
-                    <h2>Tại Sao MCP Thay Đổi Cuộc Chơi?</h2>
+                    <span class="badge">Ưu Điểm</span>
+                    <h2>Lợi Ích Của Luồng Figma MCP</h2>
                     <div class="grid-content">
                         <div class="summary-cards">
                             <div class="summary-card">
-                                <h4>🚀 Hiệu năng tối đa</h4>
-                                <p>Sử dụng giao thức nhẹ JSON-RPC qua stdio hoặc SSE, hạn chế độ trễ và tối ưu luồng truyền tải thông tin cực kỳ mượt mà.</p>
+                                <h4>⚡ Tốc độ & Độ chính xác</h4>
+                                <p>Loại bỏ khâu cắt ghép CSS thủ công. AI đọc chính xác kích thước pixel, gap spacing và layout flexbox giúp mã nguồn đồng bộ tuyệt đối với thiết kế Figma.</p>
                             </div>
                             <div class="summary-card">
-                                <h4>🧩 Khả năng tái sử dụng</h4>
-                                <p>Bạn chỉ cần viết MCP Server 1 lần duy nhất bằng Python hoặc TypeScript. Nó sẽ chạy ngay trên Claude Desktop, Cursor, và các IDE tương lai.</p>
+                                <h4>🛡️ An toàn thông tin</h4>
+                                <p>Token <code>FIGMA_API_KEY</code> được bảo mật hoàn toàn ở máy local. Figma MCP chạy qua stdio của terminal không cần qua máy chủ trung gian.</p>
                             </div>
                             <div class="summary-card">
-                                <h4>🛡️ Bảo mật cục bộ</h4>
-                                <p>Quyết định cấp quyền đọc ghi hoàn toàn nằm ở phía Client của người dùng. Dữ liệu nhạy cảm được xử lý cục bộ trước khi gửi lên LLM.</p>
+                                <h4>⚙️ Chuẩn hóa UI Component</h4>
+                                <p>Sự kết hợp giữa Figma Design Token và code giúp tránh việc sinh code rác. Sử dụng các component thiết kế tái sử dụng giúp mã nguồn sạch hơn.</p>
                             </div>
                         </div>
                     </div>

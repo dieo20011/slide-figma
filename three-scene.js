@@ -1,16 +1,16 @@
-// Three.js 3D Background & Animation Logic
+// Three.js 3D Background & Animation Logic (Figma MCP Focus)
 
 let scene, camera, renderer, controls;
-let clientNode, resourceNode, toolNode, promptNode;
+let clientNode, mcpServerNode, figmaCloudNode, codeWorkspaceNode;
 let connections = {}; // Store curve paths
 let backgroundParticles;
 
 // Camera targets for each slide (0-indexed)
 const cameraTargets = [
-    { pos: { x: 0, y: 1, z: 8 }, look: { x: 0, y: 0, z: 0 } },       // Slide 0: Title
-    { pos: { x: -3.5, y: 0.8, z: 4.5 }, look: { x: -3, y: 0, z: 0 } },  // Slide 1: What is MCP (Focus Client)
+    { pos: { x: 0, y: 1, z: 8 }, look: { x: 0, y: 0, z: 0 } },         // Slide 0: Title
+    { pos: { x: -3.5, y: 0.8, z: 4.5 }, look: { x: -3, y: 0, z: 0 } },  // Slide 1: What is Figma MCP (Focus Client)
     { pos: { x: 0, y: 4, z: 6 }, look: { x: 0, y: 0, z: 0 } },         // Slide 2: Architecture
-    { pos: { x: 1.5, y: 1.5, z: 4.5 }, look: { x: 1, y: 0, z: 0 } },    // Slide 3: Data Flow
+    { pos: { x: 1.5, y: 1.5, z: 4.5 }, look: { x: 1, y: 0, z: 0 } },    // Slide 3: Data Flow (Focus Cloud & Server)
     { pos: { x: 0, y: 1.5, z: 7 }, look: { x: 0, y: 0, z: 0 } },        // Slide 4: Interactive Simulator (User control)
     { pos: { x: 2.5, y: -0.8, z: 5 }, look: { x: 0, y: 0, z: 0 } }     // Slide 5: Summary
 ];
@@ -83,7 +83,7 @@ function init3D() {
 function createNodes() {
     // A. AI CLIENT (Large glowing wireframe sphere on the left)
     const clientGroup = new THREE.Group();
-    clientGroup.position.set(-3, 0, 0);
+    clientGroup.position.set(-3.2, 0, 0);
 
     const innerGeo = new THREE.SphereGeometry(0.5, 32, 32);
     const innerMat = new THREE.MeshPhongMaterial({
@@ -109,9 +109,9 @@ function createNodes() {
     // Orbiting ring
     const ringGeo = new THREE.TorusGeometry(1.1, 0.02, 8, 64);
     const ringMat = new THREE.MeshBasicMaterial({
-        color: 0xbd5eff,
+        color: 0x00f0ff,
         transparent: true,
-        opacity: 0.4
+        opacity: 0.3
     });
     const orbitRing = new THREE.Mesh(ringGeo, ringMat);
     orbitRing.rotation.x = Math.PI / 3;
@@ -120,110 +120,120 @@ function createNodes() {
     scene.add(clientGroup);
     clientNode = clientGroup;
 
-    // B. RESOURCE SERVER (Database Cylinder - Top right)
-    const resourceGroup = new THREE.Group();
-    resourceGroup.position.set(3, 1.5, -0.5);
+    // B. FIGMA MCP SERVER (Broker - Middle center)
+    const mcpGroup = new THREE.Group();
+    mcpGroup.position.set(0, 0.5, 0);
 
-    const cylGeo = new THREE.CylinderGeometry(0.35, 0.35, 0.7, 16);
-    const cylMat = new THREE.MeshPhongMaterial({
-        color: 0x00f5d4,
-        emissive: 0x00c4a9,
-        emissiveIntensity: 0.3,
-        shininess: 40
-    });
-    const dbCylinder = new THREE.Mesh(cylGeo, cylMat);
-    resourceGroup.add(dbCylinder);
-
-    // Mini decorative disk at base
-    const baseGeo = new THREE.CylinderGeometry(0.45, 0.45, 0.08, 16);
-    const baseMat = new THREE.MeshBasicMaterial({ color: 0x00f5d4, wireframe: true });
-    const dbBase = new THREE.Mesh(baseGeo, baseMat);
-    dbBase.position.y = -0.35;
-    resourceGroup.add(dbBase);
-
-    scene.add(resourceGroup);
-    resourceNode = resourceGroup;
-
-    // C. TOOL SERVER (Hexagonal Prism / Gear - Middle right)
-    const toolGroup = new THREE.Group();
-    toolGroup.position.set(3, 0, 0);
-
-    const toolGeo = new THREE.IcosahedronGeometry(0.45, 0);
-    const toolMat = new THREE.MeshPhongMaterial({
+    const boxGeo = new THREE.BoxGeometry(0.7, 0.7, 0.7);
+    const boxMat = new THREE.MeshPhongMaterial({
         color: 0xbd5eff,
         emissive: 0x8a2be2,
         emissiveIntensity: 0.4,
         shininess: 50,
         flatShading: true
     });
-    const toolMesh = new THREE.Mesh(toolGeo, toolMat);
-    toolGroup.add(toolMesh);
+    const mcpBox = new THREE.Mesh(boxGeo, boxMat);
+    mcpGroup.add(mcpBox);
 
-    // Orbiting small cube
-    const subGeo = new THREE.BoxGeometry(0.12, 0.12, 0.12);
-    const subMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
-    const toolSatellite = new THREE.Mesh(subGeo, subMat);
-    toolSatellite.position.set(0.7, 0, 0);
-    toolGroup.add(toolSatellite);
+    // Outer wire frame
+    const mcpWireGeo = new THREE.BoxGeometry(0.9, 0.9, 0.9);
+    const mcpWireMat = new THREE.MeshBasicMaterial({ color: 0xbd5eff, wireframe: true, transparent: true, opacity: 0.25 });
+    const mcpWire = new THREE.Mesh(mcpWireGeo, mcpWireMat);
+    mcpGroup.add(mcpWire);
 
-    scene.add(toolGroup);
-    toolNode = toolGroup;
-    toolNode.satellite = toolSatellite; // save reference for rotation
+    scene.add(mcpGroup);
+    mcpServerNode = mcpGroup;
 
-    // D. PROMPT SERVER (Chat Shape / Octahedron - Bottom right)
-    const promptGroup = new THREE.Group();
-    promptGroup.position.set(3, -1.5, 0.5);
+    // C. FIGMA CLOUD API (Top right)
+    const figmaGroup = new THREE.Group();
+    figmaGroup.position.set(3, 1.6, -0.6);
 
-    const promptGeo = new THREE.OctahedronGeometry(0.45, 0);
-    const promptMat = new THREE.MeshPhongMaterial({
-        color: 0xffe600,
-        emissive: 0xd4af37,
+    // Mock Figma stacked layers representation
+    for (let i = 0; i < 3; i++) {
+        const layerGeo = new THREE.BoxGeometry(0.9, 0.06, 0.6);
+        const colors = [0xff4b2b, 0xa259ff, 0x1abc9c];
+        const layerMat = new THREE.MeshPhongMaterial({
+            color: colors[i],
+            emissive: colors[i],
+            emissiveIntensity: 0.25,
+            transparent: true,
+            opacity: 0.8
+        });
+        const layer = new THREE.Mesh(layerGeo, layerMat);
+        layer.position.y = (i - 1) * 0.25;
+        figmaGroup.add(layer);
+    }
+
+    scene.add(figmaGroup);
+    figmaCloudNode = figmaGroup;
+
+    // D. LOCAL CODE EDITOR / WORKSPACE (Bottom right)
+    const codeGroup = new THREE.Group();
+    codeGroup.position.set(3, -1.2, 0.6);
+
+    const docGeo = new THREE.BoxGeometry(0.75, 0.9, 0.1);
+    const docMat = new THREE.MeshPhongMaterial({
+        color: 0x00f5d4,
+        emissive: 0x00c4a9,
         emissiveIntensity: 0.3,
         shininess: 30
     });
-    const promptMesh = new THREE.Mesh(promptGeo, promptMat);
-    promptGroup.add(promptMesh);
+    const docMesh = new THREE.Mesh(docGeo, docMat);
+    codeGroup.add(docMesh);
 
-    // Orbiting wireframe sphere
-    const promptOuterGeo = new THREE.SphereGeometry(0.65, 8, 8);
-    const promptOuterMat = new THREE.MeshBasicMaterial({ color: 0xffe600, wireframe: true, transparent: true, opacity: 0.2 });
-    const promptOuter = new THREE.Mesh(promptOuterGeo, promptOuterMat);
-    promptGroup.add(promptOuter);
+    // Decorative floating brackets
+    const bracketGeo = new THREE.BoxGeometry(0.1, 0.96, 0.15);
+    const bracketMat = new THREE.MeshBasicMaterial({ color: 0xffffff, wireframe: true });
+    const b1 = new THREE.Mesh(bracketGeo, bracketMat);
+    b1.position.x = -0.45;
+    const b2 = new THREE.Mesh(bracketGeo, bracketMat);
+    b2.position.x = 0.45;
+    codeGroup.add(b1);
+    codeGroup.add(b2);
 
-    scene.add(promptGroup);
-    promptNode = promptGroup;
+    scene.add(codeGroup);
+    codeWorkspaceNode = codeGroup;
 }
 
 function createConnections() {
     const pClient = clientNode.position;
-    
-    // Server positions
-    const servers = {
-        resource: resourceNode.position,
-        tool: toolNode.position,
-        prompt: promptNode.position
-    };
+    const pMcp = mcpServerNode.position;
+    const pFigma = figmaCloudNode.position;
+    const pCode = codeWorkspaceNode.position;
 
-    // Draw a curved line (tube) from client to each server
-    Object.keys(servers).forEach(key => {
-        const pServer = servers[key];
-        
-        // Control point for quadratic bezier curve (gives curve upwards or downwards)
-        const controlPoint = new THREE.Vector3(
-            (pClient.x + pServer.x) / 2,
-            (pClient.y + pServer.y) / 2 + (key === 'resource' ? 0.5 : key === 'prompt' ? -0.5 : 0.2),
-            (pClient.z + pServer.z) / 2
-        );
+    // 1. Client to MCP Server Path (JSON-RPC)
+    const ctrl1 = new THREE.Vector3((pClient.x + pMcp.x) / 2, (pClient.y + pMcp.y) / 2 + 0.3, 0);
+    connections['client-to-mcp'] = new THREE.QuadraticBezierCurve3(pClient, ctrl1, pMcp);
 
-        const curve = new THREE.QuadraticBezierCurve3(pClient, controlPoint, pServer);
-        connections[key] = curve;
+    // 2. MCP Server to Figma Cloud Path (REST API)
+    const ctrl2 = new THREE.Vector3((pMcp.x + pFigma.x) / 2, (pMcp.y + pFigma.y) / 2 + 0.3, -0.3);
+    connections['mcp-to-figma'] = new THREE.QuadraticBezierCurve3(pMcp, ctrl2, pFigma);
 
-        // Render curve as tube
-        const tubeGeo = new THREE.TubeGeometry(curve, 32, 0.015, 8, false);
+    // 3. Figma Cloud to MCP Server Path (Return Design Data)
+    const ctrl3 = new THREE.Vector3((pFigma.x + pMcp.x) / 2, (pFigma.y + pMcp.y) / 2 - 0.3, -0.3);
+    connections['figma-to-mcp'] = new THREE.QuadraticBezierCurve3(pFigma, ctrl3, pMcp);
+
+    // 4. MCP Server to Client Path (Return Context)
+    const ctrl4 = new THREE.Vector3((pMcp.x + pClient.x) / 2, (pMcp.y + pClient.y) / 2 - 0.3, 0);
+    connections['mcp-to-client'] = new THREE.QuadraticBezierCurve3(pMcp, ctrl4, pClient);
+
+    // 5. Client to Code Workspace (Generate code output)
+    const ctrl5 = new THREE.Vector3((pClient.x + pCode.x) / 2, (pClient.y + pCode.y) / 2 - 0.4, 0.3);
+    connections['client-to-code'] = new THREE.QuadraticBezierCurve3(pClient, ctrl5, pCode);
+
+    // Draw lines for visual representation
+    const paths = [
+        { curve: connections['client-to-mcp'], color: 0x00f0ff },
+        { curve: connections['mcp-to-figma'], color: 0xbd5eff },
+        { curve: connections['client-to-code'], color: 0x00f5d4 }
+    ];
+
+    paths.forEach(p => {
+        const tubeGeo = new THREE.TubeGeometry(p.curve, 32, 0.015, 8, false);
         const tubeMat = new THREE.MeshBasicMaterial({
-            color: key === 'resource' ? 0x00f5d4 : key === 'tool' ? 0xbd5eff : 0xffe600,
+            color: p.color,
             transparent: true,
-            opacity: 0.25
+            opacity: 0.2
         });
         const tubeLine = new THREE.Mesh(tubeGeo, tubeMat);
         scene.add(tubeLine);
@@ -231,27 +241,32 @@ function createConnections() {
 }
 
 function createBackgroundParticles() {
-    const particleCount = 150;
+    const particleCount = 120;
     const geometry = new THREE.BufferGeometry();
     const positions = new Float32Array(particleCount * 3);
     const colors = new Float32Array(particleCount * 3);
 
     for (let i = 0; i < particleCount * 3; i += 3) {
-        // Random positions inside a bounding box
         positions[i] = (Math.random() - 0.5) * 20;
         positions[i + 1] = (Math.random() - 0.5) * 12;
-        positions[i + 2] = (Math.random() - 0.7) * 15; // Put most behind the scene nodes
+        positions[i + 2] = (Math.random() - 0.7) * 15;
 
-        // Color coding
-        colors[i] = 0.5 + Math.random() * 0.5; // Red channel
-        colors[i + 1] = 0.8 + Math.random() * 0.2; // Cyanish green
-        colors[i + 2] = 1.0; // Blue
+        // Figma branding colors (Red, Orange, Purple, Blue, Green)
+        const rand = Math.random();
+        if (rand < 0.2) {
+            colors[i] = 0.95; colors[i+1] = 0.29; colors[i+2] = 0.17; // Figma Red
+        } else if (rand < 0.4) {
+            colors[i] = 0.64; colors[i+1] = 0.35; colors[i+2] = 1.0; // Figma Purple
+        } else if (rand < 0.6) {
+            colors[i] = 0.1; colors[i+1] = 0.74; colors[i+2] = 0.61; // Figma Green
+        } else {
+            colors[i] = 0.0; colors[i+1] = 0.94; colors[i+2] = 1.0; // Cyan
+        }
     }
 
     geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
     geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
 
-    // Glowing particle texture using raw canvas drawing
     const canvas = document.createElement('canvas');
     canvas.width = 16;
     canvas.height = 16;
@@ -261,7 +276,6 @@ function createBackgroundParticles() {
     gradient.addColorStop(1, 'rgba(255,255,255,0)');
     ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, 16, 16);
-    
     const texture = new THREE.CanvasTexture(canvas);
 
     const material = new THREE.PointsMaterial({
@@ -269,7 +283,7 @@ function createBackgroundParticles() {
         map: texture,
         vertexColors: true,
         transparent: true,
-        opacity: 0.45,
+        opacity: 0.35,
         depthWrite: false,
         blending: THREE.AdditiveBlending
     });
@@ -282,64 +296,77 @@ function createBackgroundParticles() {
 // Animation Triggers
 // ----------------------------------------------------
 
-// Animates a glowing data packet along the path
-window.trigger3DAnimation = function(type) {
-    const curve = connections[type];
+// Animates a packet along a specific curve, then runs a callback
+function animatePacket(curveName, color, duration, callback) {
+    const curve = connections[curveName];
     if (!curve) return;
 
-    // Create a small glowing particle sphere
     const pGeo = new THREE.SphereGeometry(0.08, 16, 16);
-    const color = type === 'resource' ? 0x00f5d4 : type === 'tool' ? 0xbd5eff : 0xffe600;
-    const pMat = new THREE.MeshBasicMaterial({
-        color: color,
-        transparent: false
-    });
-    
+    const pMat = new THREE.MeshBasicMaterial({ color: color });
     const packet = new THREE.Mesh(pGeo, pMat);
     scene.add(packet);
 
-    // Light packet helper
     const pLight = new THREE.PointLight(color, 1.5, 2);
     packet.add(pLight);
 
-    // Animate along curve from Client (0) to Server (1)
     const animateData = { progress: 0 };
-    
     gsap.to(animateData, {
         progress: 1,
-        duration: 0.8,
-        ease: "power1.in",
+        duration: duration,
+        ease: "power1.inOut",
         onUpdate: () => {
             const point = curve.getPointAt(animateData.progress);
             packet.position.copy(point);
         },
         onComplete: () => {
-            // Pulse Server node slightly on collision
-            let targetNode = type === 'resource' ? resourceNode : type === 'tool' ? toolNode : promptNode;
-            gsap.to(targetNode.scale, { x: 1.3, y: 1.3, z: 1.3, duration: 0.1, yoyo: true, repeat: 1 });
-
-            // Animate back to client
-            gsap.to(animateData, {
-                progress: 0,
-                duration: 0.8,
-                delay: 0.1,
-                ease: "power1.out",
-                onUpdate: () => {
-                    const point = curve.getPointAt(animateData.progress);
-                    packet.position.copy(point);
-                },
-                onComplete: () => {
-                    // Pulse Client on return
-                    gsap.to(clientNode.scale, { x: 1.15, y: 1.15, z: 1.15, duration: 0.1, yoyo: true, repeat: 1 });
-                    
-                    // Clean up resources
-                    scene.remove(packet);
-                    pGeo.dispose();
-                    pMat.dispose();
-                }
-            });
+            scene.remove(packet);
+            pGeo.dispose();
+            pMat.dispose();
+            if (typeof callback === 'function') callback();
         }
     });
+}
+
+window.trigger3DAnimation = function(actionType) {
+    if (actionType === 'figma-fetch') {
+        // Step 1: Client -> MCP Server
+        animatePacket('client-to-mcp', 0x00f0ff, 0.4, () => {
+            gsap.to(mcpServerNode.scale, { x: 1.25, y: 1.25, z: 1.25, duration: 0.08, yoyo: true, repeat: 1 });
+            
+            // Step 2: MCP Server -> Figma Cloud API
+            animatePacket('mcp-to-figma', 0xbd5eff, 0.5, () => {
+                gsap.to(figmaCloudNode.scale, { x: 1.2, y: 1.2, z: 1.2, duration: 0.1, yoyo: true, repeat: 1 });
+                
+                // Step 3: Figma Cloud API -> MCP Server
+                animatePacket('figma-to-mcp', 0xff4b2b, 0.5, () => {
+                    gsap.to(mcpServerNode.scale, { x: 1.25, y: 1.25, z: 1.25, duration: 0.08, yoyo: true, repeat: 1 });
+                    
+                    // Step 4: MCP Server -> Client
+                    animatePacket('mcp-to-client', 0x00f5d4, 0.4, () => {
+                        gsap.to(clientNode.scale, { x: 1.15, y: 1.15, z: 1.15, duration: 0.1, yoyo: true, repeat: 1 });
+                    });
+                });
+            });
+        });
+    } 
+    else if (actionType === 'parse-token') {
+        // Pulse Client internally (local compilation / computation)
+        gsap.to(clientNode.scale, { x: 1.25, y: 1.25, z: 1.25, duration: 0.15, yoyo: true, repeat: 3 });
+        
+        // Spin the client outer ring super fast temporarily
+        const orbitRing = clientNode.children[2];
+        gsap.to(orbitRing.rotation, {
+            z: orbitRing.rotation.z + Math.PI * 4,
+            duration: 1.0,
+            ease: "power2.out"
+        });
+    } 
+    else if (actionType === 'code-output') {
+        // Step 1: Client -> Code Editor Node
+        animatePacket('client-to-code', 0x00f5d4, 0.7, () => {
+            gsap.to(codeWorkspaceNode.scale, { x: 1.3, y: 1.3, z: 1.3, duration: 0.1, yoyo: true, repeat: 1 });
+        });
+    }
 };
 
 // Periodic auto-packets on Slide 3 (Data Flow)
@@ -347,14 +374,9 @@ let dataFlowInterval = null;
 function startAutoPackets() {
     if (dataFlowInterval) return;
     
-    const types = ['resource', 'tool', 'prompt'];
-    let counter = 0;
-    
     dataFlowInterval = setInterval(() => {
-        const type = types[counter % 3];
-        window.trigger3DAnimation(type);
-        counter++;
-    }, 2000);
+        window.trigger3DAnimation('figma-fetch');
+    }, 3500);
 }
 
 function stopAutoPackets() {
@@ -369,10 +391,8 @@ window.onSlideChange = function(slideIndex) {
     const target = cameraTargets[slideIndex];
     if (!target) return;
 
-    // Enable OrbitControls only on the Interactive Simulator (Slide 4)
     if (slideIndex === 4) {
         controls.enabled = true;
-        // Prompt user interaction on control setup
     } else {
         controls.enabled = false;
     }
@@ -387,7 +407,6 @@ window.onSlideChange = function(slideIndex) {
         ease: "power2.inOut",
         onUpdate: () => {
             if (slideIndex !== 4) {
-                // Keep controls target synced during transition so lookAt doesn't snap
                 controls.target.copy(currentLookAt);
             }
         }
@@ -425,44 +444,34 @@ function onWindowResize() {
 function animate(time) {
     requestAnimationFrame(animate);
 
-    // Gentle rotational auto-animation for nodes
     const speedFactor = 0.003;
     
     if (clientNode) {
         clientNode.rotation.y += speedFactor;
-        // Orbit ring counter rotation
         clientNode.children[2].rotation.z -= speedFactor * 1.5;
     }
     
-    if (resourceNode) {
-        resourceNode.rotation.y += speedFactor * 1.2;
+    if (mcpServerNode) {
+        mcpServerNode.rotation.x += speedFactor * 1.1;
+        mcpServerNode.rotation.y += speedFactor * 1.8;
     }
     
-    if (toolNode) {
-        toolNode.rotation.x += speedFactor * 0.8;
-        toolNode.rotation.y += speedFactor * 1.5;
-        
-        // Spin satellite gear around tool center
-        if (toolNode.satellite) {
-            const satTime = time * 0.0015;
-            toolNode.satellite.position.x = Math.cos(satTime) * 0.7;
-            toolNode.satellite.position.z = Math.sin(satTime) * 0.7;
-            toolNode.satellite.rotation.y += 0.02;
-        }
+    if (figmaCloudNode) {
+        // Slow rotation of layers
+        figmaCloudNode.rotation.y += speedFactor * 0.6;
+        // Hover float animation
+        figmaCloudNode.position.y = 1.6 + Math.sin(time * 0.0015) * 0.06;
     }
     
-    if (promptNode) {
-        promptNode.rotation.y += speedFactor;
-        promptNode.rotation.z += speedFactor * 0.5;
-        
-        // Float prompt node up/down slightly
-        promptNode.position.y = -1.5 + Math.sin(time * 0.002) * 0.08;
+    if (codeWorkspaceNode) {
+        codeWorkspaceNode.rotation.y += speedFactor * 0.8;
+        codeWorkspaceNode.position.y = -1.2 + Math.sin(time * 0.001) * 0.04;
     }
 
     // Slowly rotate background starfield
     if (backgroundParticles) {
-        backgroundParticles.rotation.y += 0.0003;
-        backgroundParticles.rotation.x += 0.0001;
+        backgroundParticles.rotation.y += 0.0002;
+        backgroundParticles.rotation.x += 0.00015;
     }
 
     // Render updates
