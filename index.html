@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Model Context Protocol (MCP) - Hướng dẫn chi tiết</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Three.js and GSAP -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+</head>
+<body>
+    <!-- Background 3D Canvas -->
+    <canvas id="three-canvas"></canvas>
+
+    <!-- App Container -->
+    <main id="app-container">
+        <!-- Presentation Title / Header -->
+        <header class="main-header">
+            <div class="logo">
+                <span class="logo-mcp">MCP</span>
+                <span class="logo-divider"></span>
+                <span class="logo-desc">Model Context Protocol</span>
+            </div>
+            <div class="slide-progress-bar">
+                <div class="progress-fill" id="progress-fill"></div>
+            </div>
+        </header>
+
+        <!-- Slides Wrapper -->
+        <div class="slides-wrapper" id="slides-wrapper">
+            
+            <!-- Slide 1: Title -->
+            <section class="slide active" id="slide-0">
+                <div class="slide-content glass-card intro-card">
+                    <span class="badge">Open Standard Protocol</span>
+                    <h1>Model Context<br><span class="gradient-text">Protocol</span></h1>
+                    <p class="subtitle">Chuẩn kết nối mở giúp đồng bộ hóa dữ liệu và công cụ cho các mô hình AI (LLMs)</p>
+                    <div class="author-info">
+                        <span class="author-icon">⚡</span>
+                        <span>Nhấn Phím Mũi Tên Phải (→) hoặc Space để bắt đầu</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Slide 2: What is MCP? -->
+            <section class="slide" id="slide-1">
+                <div class="slide-content glass-card">
+                    <span class="badge">Khái Niệm</span>
+                    <h2>MCP Là Gì?</h2>
+                    <div class="grid-content">
+                        <div class="text-block">
+                            <p><strong>Model Context Protocol (MCP)</strong> là một giao thức mã nguồn mở do <strong>Anthropic</strong> phát triển, đóng vai trò như một "cổng USB-C" tiêu chuẩn cho các mô hình ngôn ngữ lớn.</p>
+                            <ul>
+                                <li>
+                                    <span class="li-icon">🔌</span>
+                                    <div>
+                                        <strong>Kết nối hợp nhất:</strong> Thay vì xây dựng tích hợp riêng lẻ cho từng IDE và công cụ, MCP định nghĩa một chuẩn chung duy nhất.
+                                    </div>
+                                </li>
+                                <li>
+                                    <span class="li-icon">🛡️</span>
+                                    <div>
+                                        <strong>Bảo mật tối đa:</strong> Giữ quyền kiểm soát dữ liệu tại máy Client, không đẩy dữ liệu nhạy cảm trực tiếp lên đám mây không tin cậy.
+                                    </div>
+                                </li>
+                                <li>
+                                    <span class="li-icon">🔄</span>
+                                    <div>
+                                        <strong>Hai chiều linh hoạt:</strong> Cho phép AI đọc dữ liệu (Resources) và thực thi hành động (Tools).
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Slide 3: Architecture -->
+            <section class="slide" id="slide-2">
+                <div class="slide-content glass-card wide-card">
+                    <span class="badge">Kiến Trúc</span>
+                    <h2>Kiến Trúc 3 Thành Phần</h2>
+                    <div class="architecture-grid">
+                        <div class="arch-box">
+                            <div class="arch-icon host-icon">💻</div>
+                            <h3>1. MCP Host</h3>
+                            <p>Ứng dụng AI Client như Claude Desktop, Cursor, IDEs... Nơi người dùng trực tiếp tương tác và đưa ra yêu cầu.</p>
+                        </div>
+                        <div class="arch-box">
+                            <div class="arch-icon client-icon">🔄</div>
+                            <h3>2. MCP Client</h3>
+                            <p>Thành phần tích hợp bên trong Host, có nhiệm vụ thiết lập kết nối an toàn bảo mật, gửi/nhận lệnh JSON-RPC với Server.</p>
+                        </div>
+                        <div class="arch-box">
+                            <div class="arch-icon server-icon">⚙️</div>
+                            <h3>3. MCP Server</h3>
+                            <p>Các chương trình nhỏ chạy độc lập (NodeJS, Python...) cung cấp: <strong>Resources</strong> (dữ liệu), <strong>Tools</strong> (hành động) và <strong>Prompts</strong> (mẫu câu lệnh).</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Slide 4: Data flow -->
+            <section class="slide" id="slide-3">
+                <div class="slide-content glass-card">
+                    <span class="badge">Luồng Xử Lý</span>
+                    <h2>Dữ Liệu Được Xử Lý Thế Nào?</h2>
+                    <div class="flow-steps">
+                        <div class="step-item">
+                            <div class="step-num">1</div>
+                            <div class="step-text">
+                                <h4>Yêu cầu từ Người Dùng</h4>
+                                <p>User nhập prompt (Ví dụ: "Đọc file code trong thư mục slide"). Host nhận dạng ngữ cảnh và gửi tín hiệu qua Client.</p>
+                            </div>
+                        </div>
+                        <div class="step-item">
+                            <div class="step-num">2</div>
+                            <div class="step-text">
+                                <h4>Truy vấn MCP Server</h4>
+                                <p>Client chuyển đổi yêu cầu thành gói tin JSON-RPC, gửi đến MCP Server để truy xuất tài nguyên hoặc thực thi Tools.</p>
+                            </div>
+                        </div>
+                        <div class="step-item">
+                            <div class="step-num">3</div>
+                            <div class="step-text">
+                                <h4>Đóng gói Ngữ Cảnh</h4>
+                                <p>Server xử lý dưới máy local (hoặc gọi API ngoài) rồi trả dữ liệu thô về Client. Client tích hợp dữ liệu này thành Context.</p>
+                            </div>
+                        </div>
+                        <div class="step-item">
+                            <div class="step-num">4</div>
+                            <div class="step-text">
+                                <h4>Mô Hình Sinh Kết Quả</h4>
+                                <p>Client truyền Context đã làm giàu cho LLM. LLM trả về câu trả lời chính xác, thực tế cho người dùng.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Slide 5: Interactive Simulator -->
+            <section class="slide" id="slide-4">
+                <div class="slide-content glass-card wide-card interactive-slide">
+                    <span class="badge">Trực Quan 3D</span>
+                    <h2>Mô Phỏng Tương Tác MCP</h2>
+                    <p class="slide-intro-text">Click các nút dưới đây để xem cách luồng dữ liệu di chuyển trong hệ thống 3D. Kéo chuột để xoay camera 3D.</p>
+                    
+                    <div class="interactive-container">
+                        <!-- Controls panel -->
+                        <div class="control-panel">
+                            <button class="sim-btn" id="btn-resource">
+                                <span class="btn-icon">📁</span>
+                                <div class="btn-info">
+                                    <span class="btn-title">Đọc Resource (File/DB)</span>
+                                    <span class="btn-sub">Yêu cầu dữ liệu tĩnh</span>
+                                </div>
+                            </button>
+                            <button class="sim-btn" id="btn-tool">
+                                <span class="btn-icon">⚡</span>
+                                <div class="btn-info">
+                                    <span class="btn-title">Thực thi Tool (Run CLI)</span>
+                                    <span class="btn-sub">Chạy hành động có side-effect</span>
+                                </div>
+                            </button>
+                            <button class="sim-btn" id="btn-prompt">
+                                <span class="btn-icon">💬</span>
+                                <div class="btn-info">
+                                    <span class="btn-title">Nạp Prompt Template</span>
+                                    <span class="btn-sub">Tải cấu trúc câu lệnh mẫu</span>
+                                </div>
+                            </button>
+                        </div>
+
+                        <!-- Console Log panel -->
+                        <div class="console-panel">
+                            <div class="console-header">
+                                <span class="dot red"></span>
+                                <span class="dot yellow"></span>
+                                <span class="dot green"></span>
+                                <span class="console-title">JSON-RPC Traffic Log</span>
+                            </div>
+                            <div class="console-body" id="console-output">
+                                <div class="log-line system">// Sẵn sàng mô phỏng. Hãy click một hành động phía bên trái...</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Slide 6: Summary / Benefits -->
+            <section class="slide" id="slide-5">
+                <div class="slide-content glass-card">
+                    <span class="badge">Tổng Kết</span>
+                    <h2>Tại Sao MCP Thay Đổi Cuộc Chơi?</h2>
+                    <div class="grid-content">
+                        <div class="summary-cards">
+                            <div class="summary-card">
+                                <h4>🚀 Hiệu năng tối đa</h4>
+                                <p>Sử dụng giao thức nhẹ JSON-RPC qua stdio hoặc SSE, hạn chế độ trễ và tối ưu luồng truyền tải thông tin cực kỳ mượt mà.</p>
+                            </div>
+                            <div class="summary-card">
+                                <h4>🧩 Khả năng tái sử dụng</h4>
+                                <p>Bạn chỉ cần viết MCP Server 1 lần duy nhất bằng Python hoặc TypeScript. Nó sẽ chạy ngay trên Claude Desktop, Cursor, và các IDE tương lai.</p>
+                            </div>
+                            <div class="summary-card">
+                                <h4>🛡️ Bảo mật cục bộ</h4>
+                                <p>Quyết định cấp quyền đọc ghi hoàn toàn nằm ở phía Client của người dùng. Dữ liệu nhạy cảm được xử lý cục bộ trước khi gửi lên LLM.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Desktop Navigation Overlays -->
+        <div class="slide-controls">
+            <button class="control-arrow" id="prev-btn" disabled aria-label="Slide trước">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+            </button>
+            <div class="slide-indicators" id="slide-indicators">
+                <!-- Dots injected via JS -->
+            </div>
+            <button class="control-arrow" id="next-btn" aria-label="Slide tiếp theo">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+            </button>
+        </div>
+    </main>
+
+    <!-- Scripts -->
+    <script src="slides.js"></script>
+    <script src="three-scene.js"></script>
+</body>
+</html>
